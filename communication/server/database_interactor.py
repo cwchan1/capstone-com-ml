@@ -4,9 +4,19 @@ import time
 from database_constants import DatabaseConstants
 
 class DatabaseInteractor:
-    def __init__(self, database_connection, database_cursor):
-        self.connection = database_connection
-        self.cursor = database_cursor
+    def __init__(self):
+        self.connection = None
+        self.cursor = None
+
+    def initializeDatabase(self, database_location):
+        try:
+            self.connection = sqlite3.connect(database_location)
+            print(sqlite3.version)
+        except:
+            print("Error connecting to database.")
+        finally:
+            if self.connection:
+                self.cursor = self.connection.cursor()
 
     def getTableHeaders(self, table_name):
         return self.cursor.execute("PRAGMA ({})".format(table_name))
@@ -24,7 +34,7 @@ class DatabaseInteractor:
 
         return rows
 
-    def write(self, data, table_name):
+    def writeRow(self, data, table_name):
         current_data = self.cursor.execute("SELECT * from {} where {} = {}".format(table_name, 
                 DatabaseConstants.CONST_DATE, data.date))
         if current_data:
