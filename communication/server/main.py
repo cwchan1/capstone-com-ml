@@ -2,6 +2,7 @@ import argparse
 import logging
 import requests
 import json
+import time
 
 from database_interactor import DatabaseInteractor
 from server import CapstoneTCPServer
@@ -11,10 +12,10 @@ def main():
     default_database_location = ""
     default_host_name = "localhost"
     default_port = 28460
-    default_timeout = 5
+    default_timeout = 300
 
     parser = argparse.ArgumentParser(description='Lul.')
-    parser.add_argument('-h', '--host', dest='host_name', action='store',
+    parser.add_argument('-s', '--server', dest='host_name', action='store',
                             default=default_host_name,
                             help='Host name for TCP server. Defaults to localhost.')
     parser.add_argument('-p', '--port', dest='port', action='store',
@@ -54,17 +55,32 @@ def main():
 
     while True:
         # Initializating server
+        logging.info(server_connected)
+
         if ~server_connected:
-            print("Initializing server....")
+            logging.info("Initializing server....")
             if tcp_server.initializeSocket():
                 server_connected = True
-                print("Successfully initialized server.")
+                logging.info("Successfully initialized server.")
             else:
                 logging.info("Failed to initialize server or accept a connection within the specified timeout.")
-        if ~database_connected:
-            print("Connecting to database....")
-            if database_interactor.initializeDatabase(database_file):
-                database_connected = True
+
+        # if ~database_connected:
+        #     print("Connecting to database....")
+        #     if database_interactor.initializeDatabase(database_file):
+        #         database_connected = True
+        #         logging.info("Connected to the database.")
+        #     else:
+        #         logging.info("Failed to connect to the database.")
+        time.sleep( 5 )
+
+        data = {
+            "temperature": 18
+        }
+
+        data_bytes = json.dumps(data).encode('utf-8')
+
+        tcp_server.send(data_bytes)
 
 if __name__ == '__main__':
     main()

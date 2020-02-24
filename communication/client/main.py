@@ -2,13 +2,15 @@ import argparse
 import logging
 import requests
 import json
+import socket
+import time
 
 def main():
     default_database_name = "capstone.db"
     default_database_location = ""
     default_host_name = "localhost"
     default_port = 28460
-    default_timeout = 5
+    default_timeout = 300
 
     parser = argparse.ArgumentParser(description='Lul.')
     parser.add_argument('--host', dest='host_name', action='store',
@@ -33,10 +35,50 @@ def main():
 
     if arg_results.verbose:
         logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
     host_name = arg_results.host_name
     port = arg_results.port
     timeout = arg_results.timeout
+
+    server_connected = False
+
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    client_address = (host_name, port)
+
+    while True:
+        try:
+            logging.info("Connecting....")
+            client.connect( client_address )
+        except socket.error as msg:
+            logging.info("Error")
+            time.sleep(0.1)
+            continue
+        logging.info("Connected.")
+        break
+
+    while True:
+        # if ~server_connected:
+        #     try:
+        #         logging.info("Connecting....")
+        #         client.connect( client_address )
+        #     except socket.error as msg:
+        #         logging.info("Error")
+        #         time.sleep(0.1)
+        #         continue
+        #     server_connected = True
+        # else:
+        try:
+            data = client.recv(1024)
+        except socket.timeout as msg:
+            logging.debug(msg)
+
+        if data:
+            read_data = json.loads(data.decode('utf-8'))
+            logging.info("Read data: " + json.dumps(read_data))
 
 if __name__ == '__main__':
     main()
