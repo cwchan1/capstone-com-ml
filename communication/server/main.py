@@ -36,7 +36,7 @@ def main():
     arg_results = parser.parse_args()
 
     if arg_results.verbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
     host_name = arg_results.host_name
     port = arg_results.port
@@ -57,7 +57,7 @@ def main():
         # Initializating server
         logging.info(server_connected)
 
-        if ~server_connected:
+        if not server_connected:
             logging.info("Initializing server....")
             if tcp_server.initializeSocket():
                 server_connected = True
@@ -65,7 +65,7 @@ def main():
             else:
                 logging.info("Failed to initialize server or accept a connection within the specified timeout.")
 
-        # if ~database_connected:
+        # if not database_connected:
         #     print("Connecting to database....")
         #     if database_interactor.initializeDatabase(database_file):
         #         database_connected = True

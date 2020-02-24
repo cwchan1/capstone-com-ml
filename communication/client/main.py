@@ -50,35 +50,26 @@ def main():
     client_address = (host_name, port)
 
     while True:
-        try:
+        if not server_connected:
             logging.info("Connecting....")
-            client.connect( client_address )
-        except socket.error as msg:
-            logging.info("Error")
-            time.sleep(0.1)
-            continue
-        logging.info("Connected.")
-        break
-
-    while True:
-        # if ~server_connected:
-        #     try:
-        #         logging.info("Connecting....")
-        #         client.connect( client_address )
-        #     except socket.error as msg:
-        #         logging.info("Error")
-        #         time.sleep(0.1)
-        #         continue
-        #     server_connected = True
-        # else:
-        try:
-            data = client.recv(1024)
-        except socket.timeout as msg:
-            logging.debug(msg)
-
-        if data:
-            read_data = json.loads(data.decode('utf-8'))
-            logging.info("Read data: " + json.dumps(read_data))
+            try:
+                client.connect( client_address )
+            except socket.error as msg:
+                logging.info("Error")
+                time.sleep(0.1)
+                continue
+            else:
+                server_connected = True
+                logging.info("Connected to server.")
+        else:
+            try:
+                data = client.recv(1024)
+            except socket.timeout as msg:
+                logging.debug(msg)
+            else:
+                if data:
+                    read_data = json.loads(data.decode('utf-8'))
+                    logging.info("Read data: " + str(read_data.get("temperature")))
 
 if __name__ == '__main__':
     main()

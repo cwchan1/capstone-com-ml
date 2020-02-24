@@ -4,8 +4,8 @@ import socket
 class CapstoneTCPServer:
     def __init__(self, host_name, port, timeout):
         # initial variables
-        #self.address
-        #self.connection
+        self.address = None
+        self.connection = None
         self.host_name = host_name
         self.port = port
         self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,15 +24,17 @@ class CapstoneTCPServer:
 
         try:
             self.connection, self.address = self.server_socket.accept()
-            with self.connection:
+            
+        except socket.error as msg:
+            logging.debug(msg)
+            return False
+        else:
+            if self.connection:
                 logging.debug("Connection accepted on server socket.")
 
                 self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 self.connection.settimeout(self.timeout)
                 return True
-        except socket.error as msg:
-            logging.debug(msg)
-            return False
 
         return False
 
@@ -42,8 +44,15 @@ class CapstoneTCPServer:
             return 0
         else:
             return data
+            
     def send(self, data):
-        self.connection.send(data)
+        try:
+            self.connection.sendall(data)
+        except OSError as msg:
+            logging.debug("Error sending data with error message: " + msg)
+            return False
+        else:
+            return True
     
     def getHostName(self):
         return self.host_name
