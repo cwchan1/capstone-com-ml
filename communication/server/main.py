@@ -80,7 +80,11 @@ def main():
 
         data_bytes = json.dumps(data).encode('utf-8')
 
-        tcp_server.send(data_bytes)
+        if server_connected:
+                header = tcp_server.receive(2)
+                if header:
+                    read_data = json.loads(data.decode('utf-8'))
+                    logging.info("Read data: " + str(read_data.get("temperature")))
 
 if __name__ == '__main__':
     main()

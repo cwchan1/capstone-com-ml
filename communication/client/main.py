@@ -34,9 +34,9 @@ def main():
     arg_results = parser.parse_args()
 
     if arg_results.verbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
     else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
     host_name = arg_results.host_name
     port = arg_results.port

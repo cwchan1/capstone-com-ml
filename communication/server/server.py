@@ -38,12 +38,12 @@ class CapstoneTCPServer:
 
         return False
 
-    def receive(self):
-        data = self.connection.recv(1024)
-        if not data:
-            return 0
-        else:
-            return data
+    def receive(self, bytes):
+        try:
+            return self.connection.recv(bytes)
+        except socket.error as msg:
+            logging.debug("Error receiving data with error message: " + msg)
+            return None
             
     def send(self, data):
         try:
