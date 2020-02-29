@@ -4,6 +4,7 @@ import requests
 import json
 import time
 
+import database_constants
 from database_interactor import DatabaseInteractor
 from server import CapstoneTCPServer
 
@@ -36,7 +37,9 @@ def main():
     arg_results = parser.parse_args()
 
     if arg_results.verbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
     host_name = arg_results.host_name
     port = arg_results.port
@@ -72,19 +75,23 @@ def main():
         #         logging.info("Connected to the database.")
         #     else:
         #         logging.info("Failed to connect to the database.")
-        time.sleep( 5 )
-
-        data = {
-            "temperature": 18
-        }
-
-        data_bytes = json.dumps(data).encode('utf-8')
 
         if server_connected:
-                header = tcp_server.receive(2)
-                if header:
-                    read_data = json.loads(data.decode('utf-8'))
-                    logging.info("Read data: " + str(read_data.get("temperature")))
+            logging.debug("Receiving data....")
+            data = tcp_server.receive(2)
+            if data:
+                type = int.from_bytes(data, 'little')
+
+                header_data = tcp_server.receive(24)
+                header =  int.from_bytes(data, 'little')
+
+                body_data = tcp_server.receive(header)
+                if body_data:
+                    if type == 5:
+                        read_data = json.loads(body_data.decode('utf-8'))
+                        logging.info(json.dumps(read_data, sort_keys=True, indent=4))
+                    elif type == 26:
+                        logging.info("Hi, found photo")
 
 if __name__ == '__main__':
     main()

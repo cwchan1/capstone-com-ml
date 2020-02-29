@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-from database_constants import DatabaseConstants
+import database_constants
 
 class DatabaseInteractor:
     def __init__(self):
@@ -30,17 +30,17 @@ class DatabaseInteractor:
             time_to_read = date_epoch
         
         rows = self.cursor.execute("SELECT * from {} where {} = {}".format(table_name, 
-                DatabaseConstants.CONST_DATE, time_to_read))
+                database_constants.CONST_DATE, time_to_read))
 
         return rows
 
     def writeRow(self, data, table_name):
         current_data = self.cursor.execute("SELECT * from {} where {} = {}".format(table_name, 
-                DatabaseConstants.CONST_DATE, data.date))
+                database_constants.CONST_DATE, data.date))
         if current_data:
             self.cursor.execute("UPDATE {} SET {} = {} {} = {}".format(table_name, 
-                    DatabaseConstants.CONST_HUMIDITY, data.humidity, 
-                    DatabaseConstants.CONST_TEMPERATURE, data.temperature))
+                    database_constants.CONST_HUMIDITY, data.humidity, 
+                    database_constants.CONST_TEMPERATURE, data.temperature))
         else:
             self.cursor.execute("INSERT INTO {} VALUES ({}, {}, {})".format(table_name,
                     data.date, data.humidity, data.temperature))

@@ -5,6 +5,8 @@ import json
 import socket
 import time
 
+import database_constants
+
 def main():
     default_database_name = "capstone.db"
     default_database_location = ""
@@ -34,9 +36,9 @@ def main():
     arg_results = parser.parse_args()
 
     if arg_results.verbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
     else:
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)]: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%m/%d/%Y %I:%M:%S%p')
 
     host_name = arg_results.host_name
     port = arg_results.port
@@ -55,21 +57,35 @@ def main():
             try:
                 client.connect( client_address )
             except socket.error as msg:
-                logging.info("Error")
+                logging.info("Error connecting to server with error message: " + msg.strerror)
                 time.sleep(0.1)
                 continue
             else:
                 server_connected = True
                 logging.info("Connected to server.")
         else:
-            try:
-                data = client.recv(1024)
-            except socket.timeout as msg:
-                logging.debug(msg)
-            else:
-                if data:
-                    read_data = json.loads(data.decode('utf-8'))
-                    logging.info("Read data: " + str(read_data.get("temperature")))
+            data = {
+                database_constants.CONST_CARBON_DIOXIDE: 51234.222,
+                database_constants.CONST_PRESSURE: 101.32222,
+                database_constants.CONST_TEMPERATURE: 18.55555
+            }
+
+            data_bytes = json.dumps(data).encode('utf-8')
+            
+            type = 5
+            type_data = type.to_bytes(2, byteorder='little')
+
+            length = len(data_bytes).to_bytes(24, byteorder='little')
+
+            buffer_byte_array = bytearray()
+            # 24 Bytes Header for full length
+            buffer_byte_array.extend(length)
+            buffer_byte_array.extend(data_bytes)
+            logging.debug("Sending: " + str(buffer_byte_array))
+
+            client.send(bytes(buffer_byte_array))
+
+        time.sleep(1)
 
 if __name__ == '__main__':
     main()
