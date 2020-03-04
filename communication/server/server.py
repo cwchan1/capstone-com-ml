@@ -15,7 +15,7 @@ class CapstoneTCPServer:
     def initializeSocket(self):
         # setup server socket and wait for connection
         # return True if connection sucessful, False otherwise
-        logging.debug("Binding server socket on {}:{}".format(self.host_name, self.port))
+        logging.info("Binding server socket on {}, {}".format(self.host_name, self.port))
 
         server_address = (self.host_name, self.port)
 
@@ -30,7 +30,7 @@ class CapstoneTCPServer:
             return False
         else:
             if self.connection:
-                logging.debug("Connection accepted on server socket.")
+                logging.info("Connection accepted on server socket.")
 
                 self.connection.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                 self.connection.settimeout(self.timeout)
@@ -42,14 +42,14 @@ class CapstoneTCPServer:
         try:
             return self.connection.recv(bytes)
         except socket.error as msg:
-            logging.debug("Error receiving data with error message: " + msg)
+            logging.debug("Error receiving data with error message: " + str(msg))
             return None
             
     def send(self, data):
         try:
             self.connection.sendall(data)
         except OSError as msg:
-            logging.debug("Error sending data with error message: " + msg)
+            logging.debug("Error sending data with error message: " + str(msg))
             return False
         else:
             return True

@@ -79,6 +79,7 @@ def main():
 
             buffer_byte_array = bytearray()
             # 24 Bytes Header for full length
+            buffer_byte_array.extend(type_data)
             buffer_byte_array.extend(length)
             buffer_byte_array.extend(data_bytes)
             logging.debug("Sending: " + str(buffer_byte_array))
