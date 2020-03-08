@@ -6,6 +6,7 @@ import socket
 import time
 
 import database_constants
+from .PVCTmain import Sensors
 
 def main():
     default_database_name = "capstone.db"
@@ -86,7 +87,7 @@ def main():
 
             client.send(bytes(buffer_byte_array))
 
-        time.sleep(1)
+        time.sleep(10)
 
 if __name__ == '__main__':
     main()

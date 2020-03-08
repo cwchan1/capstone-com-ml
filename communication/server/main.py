@@ -84,9 +84,6 @@ def main():
 
                 header_data = tcp_server.receive(24)
                 header =  int.from_bytes(header_data, 'little')
-                logging.info("Type: " + str(type))
-                logging.info("Header: " + str(header_data))
-
 
                 body_data = tcp_server.receive(header)
                 if body_data:
