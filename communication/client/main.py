@@ -1,4 +1,5 @@
 import argparse
+import datetime
 import logging
 import requests
 import json
@@ -6,7 +7,6 @@ import socket
 import time
 
 import database_constants
-from .PVCTmain import Sensors
 
 def main():
     default_database_name = "capstone.db"
@@ -65,15 +65,18 @@ def main():
                 server_connected = True
                 logging.info("Connected to server.")
         else:
+            date = str(datetime.datetime.now())
             data = {
+                database_constants.CONST_DATE: date,
                 database_constants.CONST_CARBON_DIOXIDE: 51234.222,
+                database_constants.CONST_HUMIDITY: 5.23,
                 database_constants.CONST_PRESSURE: 101.32222,
                 database_constants.CONST_TEMPERATURE: 18.55555
             }
 
             data_bytes = json.dumps(data).encode('utf-8')
             
-            type = 5
+            type = 10
             type_data = type.to_bytes(2, byteorder='little')
 
             length = len(data_bytes).to_bytes(24, byteorder='little')

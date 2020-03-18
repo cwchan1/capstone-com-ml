@@ -13,6 +13,7 @@ def main():
     default_database_location = ""
     default_host_name = "localhost"
     default_port = 28460
+    default_table_name = "sensors_data"
     default_timeout = 300
 
     parser = argparse.ArgumentParser(description='Lul.')
@@ -68,15 +69,15 @@ def main():
             else:
                 logging.info("Failed to initialize server or accept a connection within the specified timeout.")
 
-        # if not database_connected:
-        #     print("Connecting to database....")
-        #     if database_interactor.initializeDatabase(database_file):
-        #         database_connected = True
-        #         logging.info("Connected to the database.")
-        #     else:
-        #         logging.info("Failed to connect to the database.")
+        if not database_connected:
+            print("Connecting to database....")
+            if database_interactor.initializeDatabase(database_file):
+                database_connected = True
+                logging.info("Connected to the database.")
+            else:
+                logging.info("Failed to connect to the database.")
 
-        if server_connected:
+        if server_connected and database_connected:
             logging.debug("Receiving data....")
             data = tcp_server.receive(2)
             if data:
@@ -87,11 +88,12 @@ def main():
 
                 body_data = tcp_server.receive(header)
                 if body_data:
-                    if type == 5:
+                    if type == 10:
                         read_data = json.loads(body_data.decode('utf-8'))
-                        logging.info(json.dumps(read_data, sort_keys=True, indent=4))
-                    elif type == 26:
-                        logging.info("Hi, found photo")
+                        logging.debug(json.dumps(read_data, sort_keys=True, indent=4))
 
+                        database_interactor.writeRow(read_data, default_table_name)
+                    elif type == 20:
+                        logging.debug("Hi, found photo")
 if __name__ == '__main__':
     main()
