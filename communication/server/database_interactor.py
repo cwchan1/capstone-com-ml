@@ -37,7 +37,7 @@ class DatabaseInteractor:
         sqlite_insert_with_param = "INSERT INTO '{}' ('{}', '{}', '{}') VALUES (?, ?, ?);".format(
                                     table_name,
                                     database_constants.CONST_DATE,
-                                    database_constants.CONST_BATTERY_STATUS,
+                                    #database_constants.CONST_BATTERY_STATUS,
                                     database_constants.CONST_CARBON_DIOXIDE,
                                     database_constants.CONST_DISTANCE,
                                     database_constants.CONST_HUMIDITY,
@@ -53,7 +53,7 @@ class DatabaseInteractor:
                                     database_constants.CONST_TVOC)
 
         data_tuple = (data.get(database_constants.CONST_DATE), 
-                data.get(database_constants.CONST_BATTERY_STATUS),
+                #data.get(database_constants.CONST_BATTERY_STATUS),
                 data.get(database_constants.CONST_CARBON_DIOXIDE),
                 data.get(database_constants.CONST_DISTANCE),
                 data.get(database_constants.CONST_HUMIDITY),

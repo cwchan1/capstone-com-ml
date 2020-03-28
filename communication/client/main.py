@@ -113,7 +113,7 @@ def main():
             client.send(bytes(buffer_byte_array))
 
             try:
-                image_file = open("/home/pi/PVCT/image.jpg", "wb")
+                image_file = open("/home/pi/PVCT/image.jpg", "rb")
                 image_bytes = image_file.read(1024)
                 while image_bytes:
                     client.send(image_bytes)

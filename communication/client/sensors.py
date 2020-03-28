@@ -169,6 +169,9 @@ class Sensors():
         co2Conc = self.ccs811.eco2               # CO2 concentration reading [PPM]
         tvocConc = self.ccs811.tvoc              # TVOC concentration reading [PPB]
         print("CO2: {} PPM, TVOC: {} PPB".format(self.ccs811.eco2, self.ccs811.tvoc))
+
+        data_dict[database_constants.CONST_CARBON_DIOXIDE] = co2Conc
+        data_dict[database_constants.CONST_TVOC] = tvocConc
         
         ## Pressure/Altitude sensor
         pressure = self.presSensor.pressure          # Presure sensor reading [Pa]
