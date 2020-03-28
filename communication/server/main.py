@@ -94,6 +94,7 @@ def main():
 
                         database_interactor.writeRow(read_data, default_table_name)
                     elif type == 20:
+                        logging.debug("Reading image file...")
                         try:
                             image_file = open("panel_image.jpg", "wb")
                             image_file.write(body_data)

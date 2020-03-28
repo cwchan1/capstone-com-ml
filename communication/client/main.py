@@ -119,6 +119,8 @@ def main():
                 image_file = open("/home/pi/PVCT/image.jpg", "rb")
                 image_bytes = image_file.read()
 
+                image_file.close()
+
                 length = len(image_bytes).to_bytes(24, byteorder='little')
 
                 buffer_byte_array = bytearray()
@@ -128,7 +130,7 @@ def main():
                 buffer_byte_array.extend(image_bytes)
                 logging.debug("Sending image")
 
-                image_file.close()
+                client.send(bytes(buffer_byte_array))
             except Exception as err:
                 logging.info("Failed to send image file.")
                 logging.debug("Error message: {}".format(err))
