@@ -112,12 +112,21 @@ def main():
 
             client.send(bytes(buffer_byte_array))
 
+            type = 20 # image type
+            type_data = type.to_bytes(2, byteorder='little')
+
             try:
                 image_file = open("/home/pi/PVCT/image.jpg", "rb")
-                image_bytes = image_file.read(1024)
-                while image_bytes:
-                    client.send(image_bytes)
-                    image_bytes = image_file.read(1024)
+                image_bytes = image_file.read()
+
+                length = len(image_bytes).to_bytes(24, byteorder='little')
+
+                buffer_byte_array = bytearray()
+                # 24 Bytes Header for full length
+                buffer_byte_array.extend(type_data)
+                buffer_byte_array.extend(length)
+                buffer_byte_array.extend(image_bytes)
+                logging.debug("Sending image")
 
                 image_file.close()
             except Exception as err:
