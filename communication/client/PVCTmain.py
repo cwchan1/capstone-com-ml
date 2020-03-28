@@ -134,10 +134,13 @@ print('Humidity sensor has been configured.')
 # Sets up MCP3202 ADCs
 solarIrradADC = gpiozero.MCP3202(channel=0, differential=True, select_pin=SOLAR_IRRAD_SEL_PIN_NUM)
 powerOutADC = gpiozero.MCP3202(channel=0, differential=True, select_pin=POWER_OUT_SEL_PIN_NUM)
+surfTempADC0 = gpiozero.MCP3208(channel=0, differential=False, select_pin=13)
+surfTempADC1 = gpiozero.MCP3208(channel=1, differential=False, select_pin=13)
+surfTempADC2 = gpiozero.MCP3208(channel=2, differential=False, select_pin=13)
+surfTempADC3 = gpiozero.MCP3208(channel=3, differential=False, select_pin=13)
+surfTempADC4 = gpiozero.MCP3208(channel=4, differential=False, select_pin=13)
+surfTempADC5 = gpiozero.MCP3208(channel=5, differential=False, select_pin=13)
 print('SPI ADCs have been configured.')
-
-######### Need code for MCP3208 ADCs 
-
 
 ## Wait for the AQ sensor to be ready, then wait another few seconds for things to settle
 print('Waiting for sensors to be ready.')
@@ -202,8 +205,14 @@ while True:
     ## SPI ADCs
     print("Solar Irradiance ADC Reading: " + str(solarIrradADC.value * 3.3) + " V")
     print("Power Out ADC Reading: " + str(powerOutADC.value * 3.3) + " V")
-    ######### Need code for MCP3208 ADCs 
- 
+    print("Surface Temperature 0 Reading: " + str(((surfTempADC0.value * 3300) - 500) / 10) + " degC")
+    print("Surface Temperature 1 Reading: " + str(((surfTempADC1.value * 3300) - 500) / 10) + " degC")
+    print("Surface Temperature 2 Reading: " + str(((surfTempADC2.value * 3300) - 500) / 10) + " degC")
+    print("Surface Temperature 3 Reading: " + str(((surfTempADC3.value * 3300) - 500) / 10) + " degC")
+    print("Surface Temperature 4 Reading: " + str(((surfTempADC4.value * 3300) - 500) / 10) + " degC")
+    print("Surface Temperature 5 Reading: " + str(((surfTempADC5.value * 3300) - 500) / 10) + " degC")
+    
+    
     ## Camera
     # Take a picture
     print('Taking a picture.')

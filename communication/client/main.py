@@ -7,6 +7,30 @@ import socket
 import time
 
 import database_constants
+from sensors import Sensors
+
+def packData(date, battery_status, carbon_dioxide, distance, humidity, panel_temp_one,
+                panel_temp_two, panel_temp_three, panel_temp_four, panel_temp_five, panel_temp_six,
+                power_output, pressure, temperature, tvoc):
+    data_dict = {
+        database_constants.CONST_DATE: date,
+        database_constants.CONST_BATTERY_STATUS: battery_status,
+        database_constants.CONST_CARBON_DIOXIDE: carbon_dioxide,
+        database_constants.CONST_DISTANCE: distance,
+        database_constants.CONST_HUMIDITY: humidity,
+        database_constants.CONST_PANEL_TEMPERATURE_ONE: panel_temp_one,
+        database_constants.CONST_PANEL_TEMPERATURE_TWO: panel_temp_two,
+        database_constants.CONST_PANEL_TEMPERATURE_THREE: panel_temp_three,
+        database_constants.CONST_PANEL_TEMPERATURE_FOUR: panel_temp_four,
+        database_constants.CONST_PANEL_TEMPERATURE_FIVE: panel_temp_five,
+        database_constants.CONST_PANEL_TEMPERATURE_SIX: panel_temp_six,
+        database_constants.CONST_POWER_OUTPUT: power_output,
+        database_constants.CONST_PRESSURE: pressure,
+        database_constants.CONST_TEMPERATURE: temperature,
+        database_constants.CONST_TVOC: tvoc
+    }
+
+    return data_dict
 
 def main():
     default_database_name = "capstone.db"
@@ -52,6 +76,8 @@ def main():
 
     client_address = (host_name, port)
 
+    sensors = Sensors()
+
     while True:
         if not server_connected:
             logging.info("Connecting....")
@@ -66,17 +92,13 @@ def main():
                 logging.info("Connected to server.")
         else:
             date = str(datetime.datetime.now())
-            data = {
-                database_constants.CONST_DATE: date,
-                database_constants.CONST_CARBON_DIOXIDE: 51234.222,
-                database_constants.CONST_HUMIDITY: 5.23,
-                database_constants.CONST_PRESSURE: 101.32222,
-                database_constants.CONST_TEMPERATURE: 18.55555
-            }
+            
+            data = sensors.run()
+            data[database_constants.CONST_DATE] = date
 
             data_bytes = json.dumps(data).encode('utf-8')
             
-            type = 10
+            type = 10 # data type
             type_data = type.to_bytes(2, byteorder='little')
 
             length = len(data_bytes).to_bytes(24, byteorder='little')
@@ -89,6 +111,18 @@ def main():
             logging.debug("Sending: " + str(buffer_byte_array))
 
             client.send(bytes(buffer_byte_array))
+
+            try:
+                image_file = open("/home/pi/PVCT/image.jpg", "wb")
+                image_bytes = image_file.read(1024)
+                while image_bytes:
+                    client.send(image_bytes)
+                    image_bytes = image_file.read(1024)
+
+                image_file.close()
+            except Exception as err:
+                logging.info("Failed to send image file.")
+                logging.debug("Error message: {}".format(err))
 
         time.sleep(10)
 

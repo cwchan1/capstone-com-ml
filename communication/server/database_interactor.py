@@ -32,25 +32,46 @@ class DatabaseInteractor:
         return data
 
     def writeRow(self, data, table_name):
-        # current_data = self.cursor.execute("SELECT * from {} where {} = {}".format(table_name, 
-        #         database_constants.CONST_DATE, data.date))
-        # if current_data:
-        #     self.cursor.execute("UPDATE {} SET {} = {} {} = {}".format(table_name, 
-        #             database_constants.CONST_HUMIDITY, data.humidity, 
-        #             database_constants.CONST_TEMPERATURE, data.temperature))
-        # else:
         logging.debug(type(data.get(database_constants.CONST_DATE)))
 
         sqlite_insert_with_param = "INSERT INTO '{}' ('{}', '{}', '{}') VALUES (?, ?, ?);".format(
                                     table_name,
                                     database_constants.CONST_DATE,
+                                    database_constants.CONST_BATTERY_STATUS,
+                                    database_constants.CONST_CARBON_DIOXIDE,
+                                    database_constants.CONST_DISTANCE,
                                     database_constants.CONST_HUMIDITY,
-                                    database_constants.CONST_TEMPERATURE)
+                                    database_constants.CONST_PANEL_TEMPERATURE_ONE,
+                                    database_constants.CONST_PANEL_TEMPERATURE_TWO,
+                                    database_constants.CONST_PANEL_TEMPERATURE_THREE,
+                                    database_constants.CONST_PANEL_TEMPERATURE_FOUR,
+                                    database_constants.CONST_PANEL_TEMPERATURE_FIVE,
+                                    database_constants.CONST_PANEL_TEMPERATURE_SIX,
+                                    database_constants.CONST_POWER_OUTPUT,
+                                    database_constants.CONST_PRESSURE,
+                                    database_constants.CONST_TEMPERATURE,
+                                    database_constants.CONST_TVOC)
 
-        insert_tuple = (data.get(database_constants.CONST_DATE), 
-                data.get(database_constants.CONST_HUMIDITY), 
-                data.get(database_constants.CONST_TEMPERATURE))
+        data_tuple = (data.get(database_constants.CONST_DATE), 
+                data.get(database_constants.CONST_BATTERY_STATUS),
+                data.get(database_constants.CONST_CARBON_DIOXIDE),
+                data.get(database_constants.CONST_DISTANCE),
+                data.get(database_constants.CONST_HUMIDITY),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_ONE),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_TWO),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_THREE),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_FOUR),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_FIVE),
+                data.get(database_constants.CONST_PANEL_TEMPERATURE_SIX),
+                data.get(database_constants.CONST_POWER_OUTPUT),
+                data.get(database_constants.CONST_PRESSURE),
+                data.get(database_constants.CONST_TEMPERATURE),
+                data.get(database_constants.CONST_TVOC))
 
-        self.cursor.execute(sqlite_insert_with_param, insert_tuple)
+        try:
+            self.cursor.execute(sqlite_insert_with_param, data_tuple)
 
-        self.connection.commit()
+            self.connection.commit()
+        except Exception as err:
+            logging.info("Unable to write to database properly.")
+            logging.debug("Error message: {}".format(err))

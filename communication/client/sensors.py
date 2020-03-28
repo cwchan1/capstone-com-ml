@@ -9,6 +9,8 @@ import adafruit_vc0706          # Camera library
 import Adafruit_DHT             # Humidity/Temperature sensor
 import gpiozero                 # SPI and Digital I/O
 
+import database_constants
+
 class Sensors():
     ### Constant definitions
     ## I2C (Air Quality and Pressure Sensor)
@@ -95,6 +97,12 @@ class Sensors():
         # Sets up MCP3202 ADCs
         self.solarIrradADC = gpiozero.MCP3202(channel=0, differential=True, select_pin=Sensors.SOLAR_IRRAD_SEL_PIN_NUM)
         self.powerOutADC = gpiozero.MCP3202(channel=0, differential=True, select_pin=Sensors.POWER_OUT_SEL_PIN_NUM)
+        self.surfTempADC0 = gpiozero.MCP3208(channel=0, differential=False, select_pin=13)
+        self.surfTempADC1 = gpiozero.MCP3208(channel=1, differential=False, select_pin=13)
+        self.surfTempADC2 = gpiozero.MCP3208(channel=2, differential=False, select_pin=13)
+        self.surfTempADC3 = gpiozero.MCP3208(channel=3, differential=False, select_pin=13)
+        self.surfTempADC4 = gpiozero.MCP3208(channel=4, differential=False, select_pin=13)
+        self.surfTempADC5 = gpiozero.MCP3208(channel=5, differential=False, select_pin=13)
         print('SPI ADCs have been configured.')
 
         ######### Need code for MCP3208 ADCs 
@@ -151,6 +159,8 @@ class Sensors():
     
     ### Real-time loop
     def run(self):
+        data_dict = {}
+
         print('------------------------------------------------\n')
         # Keeps track of time for each loop
         startTime = time.time()
@@ -167,6 +177,9 @@ class Sensors():
         print("A: ", altitude, " m")
         presTemp = self.presSensor.temperature       # Temperature reading [degC]
         print("T: ", presTemp, " degC")
+
+        data_dict[database_constants.CONST_PRESSURE] = pressure
+        data_dict[database_constants.CONST_TEMPERATURE] = presTemp
         
         ## Ultrasonic sensor
         # Takes several readings and puts them in an array
@@ -192,6 +205,8 @@ class Sensors():
         else:
             print("Error with Ultrasonic Sensor Reading.")
 
+        data_dict[database_constants.CONST_DISTANCE] = ultraDistance
+
         ## Humidity sensor
         # Takes a reading from the sensor
         (humidity, humidTemp) = Adafruit_DHT.read_retry(self.humidSensor, self.humidPin)
@@ -200,10 +215,28 @@ class Sensors():
             print("Humid: ", humidity, "%")
         else:
             print("Failed to get reading. Try again!")
+
+        data_dict[database_constants.CONST_HUMIDITY] = humidity
             
         ## SPI ADCs
         print("Solar Irradiance ADC Reading: " + str(self.solarIrradADC.value * 3.3) + " V")
         print("Power Out ADC Reading: " + str(self.powerOutADC.value * 3.3) + " V")
+        print("Surface Temperature 0 Reading: " + str(((self.surfTempADC0.value * 3300) - 500) / 10) + " degC")
+        print("Surface Temperature 1 Reading: " + str(((self.surfTempADC1.value * 3300) - 500) / 10) + " degC")
+        print("Surface Temperature 2 Reading: " + str(((self.surfTempADC2.value * 3300) - 500) / 10) + " degC")
+        print("Surface Temperature 3 Reading: " + str(((self.surfTempADC3.value * 3300) - 500) / 10) + " degC")
+        print("Surface Temperature 4 Reading: " + str(((self.surfTempADC4.value * 3300) - 500) / 10) + " degC")
+        print("Surface Temperature 5 Reading: " + str(((self.surfTempADC5.value * 3300) - 500) / 10) + " degC")
+
+        #data_dict[database_constants.CONST_POWER_OUTPUT] = self.solarIrradADC.value
+        data_dict[database_constants.CONST_POWER_OUTPUT] = self.powerOutADC.value
+        data_dict[database_constants.CONST_POWER_OUTPUT] = self.surfTempADC0.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_ONE] = self.surfTempADC0.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_TWO] = self.surfTempADC1.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_THREE] = self.surfTempADC2.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_FOUR] = self.surfTempADC3.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_FIVE] = self.surfTempADC4.value
+        data_dict[database_constants.CONST_PANEL_TEMPERATURE_SIX] = self.surfTempADC5.value
         ######### Need code for MCP3208 ADCs 
     
         ## Camera
@@ -246,3 +279,5 @@ class Sensors():
         
         print("Real time loop complete in ", time.time() - startTime, " seconds.")
         print('------------------------------------------------\n')
+
+        return data_dict

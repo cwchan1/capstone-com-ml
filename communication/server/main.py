@@ -94,6 +94,13 @@ def main():
 
                         database_interactor.writeRow(read_data, default_table_name)
                     elif type == 20:
-                        logging.debug("Hi, found photo")
+                        try:
+                            image_file = open("panel_image.jpg", "wb")
+                            image_file.write(body_data)
+                            image_file.close()
+                        except Exception as err:
+                            logging.info("Failed to write image file to panel_image.jpg.")
+                            logging.debug("Error Message: {}".format(err))
+
 if __name__ == '__main__':
     main()
