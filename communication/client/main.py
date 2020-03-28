@@ -130,7 +130,7 @@ def main():
                 buffer_byte_array.extend(image_bytes)
                 logging.debug("Sending image")
 
-                client.send(bytes(buffer_byte_array))
+                client.sendall(bytes(buffer_byte_array))
             except Exception as err:
                 logging.info("Failed to send image file.")
                 logging.debug("Error message: {}".format(err))
